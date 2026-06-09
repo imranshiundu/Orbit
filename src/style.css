@@ -1,0 +1,66 @@
+:root {
+  /* Color Palette */
+  --space: #0a0a14;
+  --panel: #0f1025;
+  --surface: #1a1c38;
+  --primary: #534AB7;
+  --primary-lt: #9a91e8;
+  --sun: #F5A623;
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.45);
+  --warm: #E8593C;
+  --cool: #3B8BD4;
+  --mars: #C8673C;
+  --jupiter: #C4A66C;
+
+  /* Typography */
+  --font-family: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  
+  --h1: 500 22px var(--font-family);
+  --h2: 500 18px var(--font-family);
+  --h3: 500 16px var(--font-family);
+  --body: 400 14px var(--font-family);
+  --caption: 400 12px var(--font-family);
+  --mono: 400 13px var(--font-mono);
+
+  /* Spacing */
+  --space-1: 4px; /* Icon gap, tight */
+  --space-2: 8px; /* List item padding */
+  --space-3: 16px; /* Component gap */
+  --space-4: 24px; /* Section padding */
+  --space-5: 48px; /* Page margin */
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px; /* default */
+  --radius-lg: 12px; /* panel */
+  --radius-pill: 50%;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--space);
+  color: var(--text);
+  font: var(--body);
+  overflow: hidden; /* For 3D canvas */
+}
+
+#app {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* Base Utility Classes */
+.h1 { font: var(--h1); }
+.h2 { font: var(--h2); }
+.h3 { font: var(--h3); }
+.caption { font: var(--caption); color: var(--muted); }
+.mono { font: var(--mono); }
