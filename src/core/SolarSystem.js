@@ -5,7 +5,7 @@ export class SolarSystem {
   constructor(scene) {
     this.scene = scene;
     this.sun = new Sun();
-    this.planets = [];
+    this.planets = new Map();
   }
 
   init() {
@@ -13,12 +13,20 @@ export class SolarSystem {
   }
 
   addPlanet(planetData) {
-    const planet = new Planet(planetData);
-    this.planets.push(planet);
-    return planet;
+    if (this.planets.has(planetData.id)) return;
+    const planet = new Planet(planetData, this.scene);
+    this.planets.set(planetData.id, planet);
   }
 
-  update(deltaTime, speedMultiplier) {
-    this.planets.forEach(p => p.update(deltaTime, speedMultiplier));
+  removePlanet(id) {
+    const planet = this.planets.get(id);
+    if (planet) {
+      planet.destroy();
+      this.planets.delete(id);
+    }
+  }
+
+  update(deltaTime) {
+    this.planets.forEach(p => p.update(deltaTime));
   }
 }

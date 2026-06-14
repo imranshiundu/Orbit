@@ -1,32 +1,36 @@
 export class Animator {
-  constructor(solarSystem, state) {
+  constructor(solarSystem, renderer, scene, camera, store) {
     this.solarSystem = solarSystem;
-    this.state = state;
+    this.renderer = renderer;
+    this.scene = scene;
+    this.camera = camera;
+    this.store = store;
+    
     this.lastTime = performance.now();
-    this.animationId = null;
+    this.rafId = null;
   }
 
   start() {
     this.lastTime = performance.now();
-    this.loop();
+    const tick = (timestamp) => {
+      const delta = (timestamp - this.lastTime) / 1000;
+      this.lastTime = timestamp;
+
+      const state = this.store.getState();
+      if (!state.paused) {
+        this.solarSystem.update(delta * state.speed);
+      }
+
+      this.renderer.render(this.scene, this.camera);
+      this.rafId = requestAnimationFrame(tick);
+    };
+    this.rafId = requestAnimationFrame(tick);
   }
 
   stop() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
     }
-  }
-
-  loop() {
-    const currentTime = performance.now();
-    const deltaTime = (currentTime - this.lastTime) / 1000; // in seconds
-    this.lastTime = currentTime;
-
-    if (!this.state.paused) {
-      this.solarSystem.update(deltaTime, this.state.speed);
-    }
-
-    this.animationId = requestAnimationFrame(() => this.loop());
   }
 }

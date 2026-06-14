@@ -34,19 +34,17 @@ Fully implemented CSS Custom Properties containing:
 
 ## 🚧 What is Left to Build (Next Phases)
 
-### Phase 1: Scene Skeleton
-- Set up `scene.js` to initialize Three.js `WebGLRenderer`, `Scene`, `PerspectiveCamera`, and `OrbitControls`.
-- Wire `scene.js` to `main.js`.
-- Add `AmbientLight` to scene.
+### 5. Render Core (Three.js Engine)
+- **Scene Setup (`scene.js`)**: WebGLRenderer, Scene, PerspectiveCamera, OrbitControls, and AmbientLight are configured and wired into `main.js`.
+- **Scaling (`scaling.js`)**: Logarithmic scale helper for distance, square-root scale helper for sizes.
+- **Engine Logic**: `Animator.js` requestAnimationFrame loop calculating proper delta time. `SolarSystem.js` instantiates and manages the Sun and Planets.
+- **Entities**: `Sun.js` (Mesh + PointLight), `Planet.js` (Pivot Group, Mesh, correct orbital and axial rotation logic), `OrbitPath.js` (RingGeometry).
 
-### Phase 2: Core Render Logic
-- Fill out `SolarSystem.js` and `Planet.js` to instantiate actual Three.js geometries and materials.
-- Implement the scaling logic inside `utils/scaling.js` (`scaleDistance` and `scaleSize`).
-- Draw the `OrbitPath` rings.
+## 🚧 What is Left to Build (Next Phases)
 
 ### Phase 3: Textures and Assets
 - Implement `TextureLoader.js` singleton.
-- Map Earth's texture and implement axial tilt / self-rotation inside `Planet.js`.
+- Map Earth's texture inside `Planet.js`.
 - Bring in the other default planets from `planets.json`.
 
 ### Phase 4: Moons Integration

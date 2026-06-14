@@ -1,6 +1,6 @@
 # Orbit 🌎 - Interactive 3D Solar System
 
-![Orbit Application Interface](./assets/orbit-ui.png)
+![Orbit Application Interface](./assets/orbit_ui_layout.png)
 
 ## The Situation 👀
 Your local school runs an after-school science club. Science is cool, but sometimes kids need a little help to get curious.
