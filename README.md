@@ -40,6 +40,42 @@ Hovering the cursor over a planet or its orbital path displays:
 - **Real Textures:** Planets feature real textures and rotation (e.g., Earth with distinct landmasses and oceans).
 - **Moons:** Kids can see moons orbiting their respective planets, with full CRUD support.
 
+## Architecture
+
+```text
+orbit/
+├── index.html              ← single HTML shell, mounts canvas + sidebar
+├── vite.config.js
+├── package.json
+└── src/
+    ├── main.js             ← bootstraps scene, store, UI, starts rAF
+    ├── scene.js            ← Three.js scene, camera, renderer, lights
+    ├── store.js            ← reactive state (EventEmitter pattern)
+    ├── style.css
+    ├── core/
+    │   ├── SolarSystem.js  ← manages all celestial bodies, calls update()
+    │   ├── Planet.js       ← Mesh, pivot group, orbit, self-rotation
+    │   ├── Moon.js         ← child of Planet, same interface
+    │   ├── Sun.js          ← PointLight + sphere + lens flare sprite
+    │   ├── OrbitPath.js    ← RingGeometry ellipse per planet
+    │   ├── Animator.js     ← requestAnimationFrame loop, delta time
+    │   └── TextureLoader.js← singleton cache, loads from /assets/textures/
+    ├── ui/
+    │   ├── Sidebar.js      ← planet list, add button, wires to store
+    │   ├── PlanetPanel.js  ← create/edit sliding drawer
+    │   ├── MoonPanel.js    ← same for moons, parented to a planet
+    │   ├── SpeedControl.js ← play/pause/slider → animator.speed
+    │   ├── Tooltip.js      ← follows mouse, shows on hover
+    │   └── ConfirmModal.js ← delete confirmation
+    ├── utils/
+    │   ├── scaling.js      ← logarithmic scale helpers for size + distance
+    │   └── raycaster.js    ← mouse → Three.js ray, returns hit object
+    ├── data/
+    │   └── planets.json    ← name, radius, distance, period, color, texture, moons[]
+    └── assets/
+        └── textures/       ← sun.jpg, mercury.jpg, venus.jpg … pluto.jpg, moon.jpg
+```
+
 ## Getting Started
 
 ### Prerequisites
