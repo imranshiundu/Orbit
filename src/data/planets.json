@@ -19,6 +19,8 @@
         "color": "#b0aeae",
         "texture": "moon.jpg"
       }
-    ]
+    ,
+  { "id": "mercury", "name": "Mercury", "diameterKm": 4879, "distanceAU": 0.39, "orbitalPeriodDays": 88, "color": "#8c8c8c" }
+]
   }
 ]
