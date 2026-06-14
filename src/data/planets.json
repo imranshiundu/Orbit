@@ -25,6 +25,8 @@
   { "id": "venus", "name": "Venus", "diameterKm": 12104, "distanceAU": 0.72, "orbitalPeriodDays": 225, "color": "#e3bb76" }
 ,
   { "id": "mars", "name": "Mars", "diameterKm": 6792, "distanceAU": 1.52, "orbitalPeriodDays": 687, "color": "#c1440e" }
+,
+  { "id": "jupiter", "name": "Jupiter", "diameterKm": 139820, "distanceAU": 5.20, "orbitalPeriodDays": 4333, "color": "#d39c7e" }
 ]
   }
 ]
