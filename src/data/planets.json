@@ -27,6 +27,8 @@
   { "id": "mars", "name": "Mars", "diameterKm": 6792, "distanceAU": 1.52, "orbitalPeriodDays": 687, "color": "#c1440e" }
 ,
   { "id": "jupiter", "name": "Jupiter", "diameterKm": 139820, "distanceAU": 5.20, "orbitalPeriodDays": 4333, "color": "#d39c7e" }
+,
+  { "id": "saturn", "name": "Saturn", "diameterKm": 116460, "distanceAU": 9.58, "orbitalPeriodDays": 10759, "color": "#ead6b8" }
 ]
   }
 ]
