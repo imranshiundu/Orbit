@@ -1,0 +1,24 @@
+[
+  {
+    "id": "earth",
+    "name": "Earth",
+    "diameterKm": 12742,
+    "distanceAU": 1.0,
+    "orbitalPeriodDays": 365.25,
+    "axialTiltDeg": 23.4,
+    "rotationPeriodHours": 24,
+    "color": "#6faad4",
+    "texture": "earth.jpg",
+    "moons": [
+      {
+        "id": "moon",
+        "name": "Moon",
+        "diameterKm": 3474,
+        "distancePlanetKm": 384400,
+        "orbitalPeriodDays": 27.3,
+        "color": "#b0aeae",
+        "texture": "moon.jpg"
+      }
+    ]
+  }
+]
