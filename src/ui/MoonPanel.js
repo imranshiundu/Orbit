@@ -1,0 +1,1 @@
+export class MoonPanel { render() { return '<div class="panel">Moon Editor</div>'; } }
