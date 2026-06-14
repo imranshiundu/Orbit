@@ -1,0 +1,1 @@
+export class SpeedControl { render() { return '<div class="control">Speed</div>'; } }
