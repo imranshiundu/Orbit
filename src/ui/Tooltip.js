@@ -1,0 +1,1 @@
+export class Tooltip { render() { return '<div class="tooltip">Info</div>'; } }
