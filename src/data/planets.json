@@ -33,6 +33,8 @@
   { "id": "uranus", "name": "Uranus", "diameterKm": 50724, "distanceAU": 19.22, "orbitalPeriodDays": 30687, "color": "#4b70dd" }
 ,
   { "id": "neptune", "name": "Neptune", "diameterKm": 49244, "distanceAU": 30.05, "orbitalPeriodDays": 60190, "color": "#4b70dd" }
+,
+  { "id": "pluto", "name": "Pluto", "diameterKm": 2376, "distanceAU": 39.48, "orbitalPeriodDays": 90560, "color": "#dddddd" }
 ]
   }
 ]
