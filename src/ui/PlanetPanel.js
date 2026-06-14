@@ -1,0 +1,1 @@
+export class PlanetPanel { render() { return '<div class="panel">Planet Editor</div>'; } }
