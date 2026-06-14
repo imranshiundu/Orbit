@@ -21,6 +21,8 @@
       }
     ,
   { "id": "mercury", "name": "Mercury", "diameterKm": 4879, "distanceAU": 0.39, "orbitalPeriodDays": 88, "color": "#8c8c8c" }
+,
+  { "id": "venus", "name": "Venus", "diameterKm": 12104, "distanceAU": 0.72, "orbitalPeriodDays": 225, "color": "#e3bb76" }
 ]
   }
 ]
