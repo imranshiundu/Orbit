@@ -1,0 +1,1 @@
+export class ConfirmModal { render() { return '<div class="modal">Confirm</div>'; } }
