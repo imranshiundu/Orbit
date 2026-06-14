@@ -64,3 +64,17 @@ body {
 .h3 { font: var(--h3); }
 .caption { font: var(--caption); color: var(--muted); }
 .mono { font: var(--mono); }
+
+/* Tags & Status */
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font: var(--caption);
+  border: 1px solid currentColor;
+}
+.tag-gas-giant { color: var(--primary-lt); border-color: var(--primary); }
+.tag-rocky { color: var(--cool); border-color: rgba(59, 139, 212, 0.5); }
+.tag-has-moons { color: #6f9f4a; border-color: rgba(111, 159, 74, 0.5); }
+.tag-dwarf { color: var(--warm); border-color: rgba(232, 89, 60, 0.5); }
+.tag-custom { color: var(--primary); border-color: rgba(83, 74, 183, 0.5); }
