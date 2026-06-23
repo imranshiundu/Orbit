@@ -8,7 +8,7 @@
     "axialTiltDeg": 23.4,
     "rotationPeriodHours": 24,
     "color": "#6faad4",
-    "texture": "earth.jpg",
+    "texture": "2k_earth_daymap.jpg",
     "moons": [
       {
         "id": "moon",
@@ -17,24 +17,16 @@
         "distancePlanetKm": 384400,
         "orbitalPeriodDays": 27.3,
         "color": "#b0aeae",
-        "texture": "moon.jpg"
+        "texture": "2k_moon.jpg"
       }
-    ,
-  { "id": "mercury", "name": "Mercury", "diameterKm": 4879, "distanceAU": 0.39, "orbitalPeriodDays": 88, "color": "#8c8c8c" }
-,
-  { "id": "venus", "name": "Venus", "diameterKm": 12104, "distanceAU": 0.72, "orbitalPeriodDays": 225, "color": "#e3bb76" }
-,
-  { "id": "mars", "name": "Mars", "diameterKm": 6792, "distanceAU": 1.52, "orbitalPeriodDays": 687, "color": "#c1440e" }
-,
-  { "id": "jupiter", "name": "Jupiter", "diameterKm": 139820, "distanceAU": 5.20, "orbitalPeriodDays": 4333, "color": "#d39c7e" }
-,
-  { "id": "saturn", "name": "Saturn", "diameterKm": 116460, "distanceAU": 9.58, "orbitalPeriodDays": 10759, "color": "#ead6b8" }
-,
-  { "id": "uranus", "name": "Uranus", "diameterKm": 50724, "distanceAU": 19.22, "orbitalPeriodDays": 30687, "color": "#4b70dd" }
-,
-  { "id": "neptune", "name": "Neptune", "diameterKm": 49244, "distanceAU": 30.05, "orbitalPeriodDays": 60190, "color": "#4b70dd" }
-,
-  { "id": "pluto", "name": "Pluto", "diameterKm": 2376, "distanceAU": 39.48, "orbitalPeriodDays": 90560, "color": "#dddddd" }
-]
-  }
+    ]
+  },
+  { "id": "mercury", "name": "Mercury", "diameterKm": 4879, "distanceAU": 0.39, "orbitalPeriodDays": 88, "rotationPeriodHours": 1407, "color": "#8c8c8c", "texture": "2k_mercury.jpg" },
+  { "id": "venus", "name": "Venus", "diameterKm": 12104, "distanceAU": 0.72, "orbitalPeriodDays": 225, "rotationPeriodHours": 5832, "color": "#e3bb76", "texture": "2k_venus_surface.jpg" },
+  { "id": "mars", "name": "Mars", "diameterKm": 6792, "distanceAU": 1.52, "orbitalPeriodDays": 687, "rotationPeriodHours": 24.6, "color": "#c1440e", "texture": "2k_mars.jpg" },
+  { "id": "jupiter", "name": "Jupiter", "diameterKm": 139820, "distanceAU": 5.20, "orbitalPeriodDays": 4333, "rotationPeriodHours": 9.9, "color": "#d39c7e", "texture": "2k_jupiter.jpg" },
+  { "id": "saturn", "name": "Saturn", "diameterKm": 116460, "distanceAU": 9.58, "orbitalPeriodDays": 10759, "rotationPeriodHours": 10.7, "color": "#ead6b8", "texture": "2k_saturn.jpg" },
+  { "id": "uranus", "name": "Uranus", "diameterKm": 50724, "distanceAU": 19.22, "orbitalPeriodDays": 30687, "rotationPeriodHours": 17.2, "color": "#4b70dd", "texture": "2k_uranus.jpg" },
+  { "id": "neptune", "name": "Neptune", "diameterKm": 49244, "distanceAU": 30.05, "orbitalPeriodDays": 60190, "rotationPeriodHours": 16.1, "color": "#4b70dd", "texture": "2k_neptune.jpg" },
+  { "id": "pluto", "name": "Pluto", "diameterKm": 2376, "distanceAU": 39.48, "orbitalPeriodDays": 90560, "rotationPeriodHours": 153.3, "color": "#dddddd", "texture": "" }
 ]
