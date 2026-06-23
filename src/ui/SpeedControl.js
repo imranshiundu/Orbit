@@ -7,8 +7,8 @@ export class SpeedControl {
   render() {
     const state = this.store.getState();
     this.container.innerHTML = `
-      <div style="background: var(--panel); border-radius: var(--radius-md); padding: var(--space-3); margin-top: var(--space-3); display: flex; align-items: center; gap: var(--space-3);">
-        <button id="play-pause-btn" style="background: var(--surface); color: var(--text); border: none; padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer;">
+      <div class="glass-surface" style="padding: var(--space-3); margin-top: var(--space-3); display: flex; align-items: center; gap: var(--space-3);">
+        <button id="play-pause-btn" class="btn-secondary">
           ${state.paused ? '▶ Play' : '⏸ Pause'}
         </button>
         <div style="flex: 1; display: flex; align-items: center; gap: var(--space-2);">

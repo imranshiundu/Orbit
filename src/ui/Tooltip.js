@@ -34,8 +34,8 @@ export class Tooltip {
     if (!entity) return;
 
     this.container.innerHTML = `
-      <div style="background: var(--surface); border: 1px solid var(--primary); padding: var(--space-2); border-radius: var(--radius-sm); color: var(--text); pointer-events: none; white-space: nowrap; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
-        <div style="font-weight: bold; margin-bottom: 4px;">${entity.name}</div>
+      <div class="glass-panel tooltip-anim" style="padding: var(--space-2) var(--space-3); color: var(--text); pointer-events: none; white-space: nowrap;">
+        <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; color: var(--primary-lt);">${entity.name}</div>
         <div class="caption">Size: ${entity.diameterKm} km</div>
         <div class="caption">Distance: ${entity.distanceAU !== undefined ? entity.distanceAU + ' AU' : entity.distancePlanetKm + ' km'}</div>
       </div>
