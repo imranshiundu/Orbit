@@ -16,12 +16,12 @@ app.innerHTML = `
 `;
 
 const canvas = document.getElementById('glcanvas');
-const { scene, camera, renderer } = setupScene(canvas);
+const { scene, camera, renderer, controls } = setupScene(canvas);
 
 const solarSystem = new SolarSystem(scene);
 solarSystem.init();
 
-const animator = new Animator(solarSystem, renderer, scene, camera, store);
+const animator = new Animator(solarSystem, renderer, scene, camera, store, controls);
 
 store.dispatch({ type: 'SET_PLANETS', payload: planetsData });
 planetsData.forEach(p => solarSystem.addPlanet(p));
