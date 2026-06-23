@@ -28,7 +28,7 @@ export class PlanetPanel {
     }
 
     this.container.innerHTML = `
-      <div class="planet-panel" style="background: var(--panel); border-radius: var(--radius-lg); padding: var(--space-4); color: var(--text); height: 100%; overflow-y: auto;">
+      <div class="planet-panel glass-panel" style="padding: var(--space-4); color: var(--text); height: 100%; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
           <h2 class="h2">${isNew ? 'Create Planet' : 'Edit Planet'}</h2>
           <button id="close-panel-btn" style="background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.2rem;">&times;</button>
@@ -37,7 +37,7 @@ export class PlanetPanel {
         <div style="display: flex; flex-direction: column; gap: var(--space-3);">
           <label>
             <span class="caption">Name</span>
-            <input type="text" id="planet-name" value="${planet.name}" style="width: 100%; background: var(--surface); border: 1px solid var(--primary-lt); color: var(--text); padding: 6px; border-radius: var(--radius-sm); margin-top: 4px;" />
+            <input type="text" id="planet-name" value="${planet.name}" class="glass-surface" style="width: 100%; color: var(--text); padding: 8px 12px; margin-top: 4px;" />
           </label>
           
           <label>
@@ -63,12 +63,12 @@ export class PlanetPanel {
             <span class="mono" id="planet-distance-val">${planet.distanceAU} AU</span>
           </label>
 
-          <button id="save-planet-btn" style="background: var(--primary); color: white; border: none; padding: 10px; border-radius: var(--radius-md); margin-top: var(--space-2); cursor: pointer;">
+          <button id="save-planet-btn" class="btn-primary" style="margin-top: var(--space-2); width: 100%;">
             ${isNew ? 'Create' : 'Save Changes'}
           </button>
           
           ${!isNew ? `
-            <button id="delete-planet-btn" style="background: var(--warm); color: white; border: none; padding: 10px; border-radius: var(--radius-md); margin-top: var(--space-2); cursor: pointer;">
+            <button id="delete-planet-btn" class="btn-danger" style="margin-top: var(--space-2); width: 100%;">
               Delete Planet
             </button>
 
@@ -76,14 +76,14 @@ export class PlanetPanel {
             <h3 class="h3">Moons</h3>
             <div id="moon-list" style="margin-top: var(--space-2);">
               ${(planet.moons || []).map((m, i) => `
-                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface); padding: 6px 10px; border-radius: var(--radius-sm); margin-bottom: 4px; font-size: 13px;">
-                  <span>${m.name} (${m.diameterKm}km)</span>
-                  <button class="delete-moon-btn" data-index="${i}" style="background: none; border: none; color: var(--warm); cursor: pointer; font-size: 16px;">&times;</button>
+                <div class="glass-surface" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 6px; font-size: 13px;">
+                  <span>${m.name} <span class="caption">(${m.diameterKm}km)</span></span>
+                  <button class="delete-moon-btn btn-danger" data-index="${i}" style="padding: 2px 8px; font-size: 16px;">&times;</button>
                 </div>
               `).join('')}
               ${(!planet.moons || planet.moons.length === 0) ? '<div class="caption">No moons</div>' : ''}
             </div>
-            <button id="add-moon-btn" style="background: var(--surface); color: var(--primary-lt); border: 1px solid var(--primary); padding: 6px; border-radius: var(--radius-md); margin-top: var(--space-2); cursor: pointer; width: 100%;">+ Add Random Moon</button>
+            <button id="add-moon-btn" class="btn-secondary" style="margin-top: var(--space-2); width: 100%;">+ Add Random Moon</button>
           ` : ''}
         </div>
       </div>
