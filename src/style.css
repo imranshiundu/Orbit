@@ -1,41 +1,42 @@
 :root {
   /* Color Palette */
-  --space: #0a0a14;
-  --panel: #0f1025;
-  --surface: #1a1c38;
-  --primary: #534AB7;
-  --primary-lt: #9a91e8;
-  --sun: #F5A623;
+  --space: #050508;
+  --primary: #6B5BFF;
+  --primary-lt: #A49BFF;
+  --sun: #FFB020;
   --text: #ffffff;
-  --muted: rgba(255, 255, 255, 0.45);
-  --warm: #E8593C;
-  --cool: #3B8BD4;
-  --mars: #C8673C;
-  --jupiter: #C4A66C;
+  --muted: rgba(255, 255, 255, 0.5);
+  --warm: #FF5A5F;
+  --cool: #00D2FF;
+
+  /* Glassmorphism Variables */
+  --panel-bg: rgba(10, 10, 18, 0.65);
+  --surface-bg: rgba(255, 255, 255, 0.05);
+  --panel-blur: blur(16px);
+  --panel-border: 1px solid rgba(255, 255, 255, 0.08);
 
   /* Typography */
-  --font-family: 'Inter', system-ui, sans-serif;
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   
-  --h1: 500 22px var(--font-family);
-  --h2: 500 18px var(--font-family);
+  --h1: 600 24px var(--font-family);
+  --h2: 600 20px var(--font-family);
   --h3: 500 16px var(--font-family);
   --body: 400 14px var(--font-family);
   --caption: 400 12px var(--font-family);
   --mono: 400 13px var(--font-mono);
 
   /* Spacing */
-  --space-1: 4px; /* Icon gap, tight */
-  --space-2: 8px; /* List item padding */
-  --space-3: 16px; /* Component gap */
-  --space-4: 24px; /* Section padding */
-  --space-5: 48px; /* Page margin */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
 
   /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px; /* default */
-  --radius-lg: 12px; /* panel */
-  --radius-pill: 50%;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 99px;
 }
 
 * {
@@ -48,7 +49,7 @@ body {
   background-color: var(--space);
   color: var(--text);
   font: var(--body);
-  overflow: hidden; /* For 3D canvas */
+  overflow: hidden;
 }
 
 #app {
@@ -58,23 +59,104 @@ body {
   position: relative;
 }
 
-/* Base Utility Classes */
-.h1 { font: var(--h1); }
-.h2 { font: var(--h2); }
+/* Typography Utility Classes */
+.h1 { font: var(--h1); letter-spacing: -0.5px; }
+.h2 { font: var(--h2); letter-spacing: -0.3px; }
 .h3 { font: var(--h3); }
 .caption { font: var(--caption); color: var(--muted); }
 .mono { font: var(--mono); }
 
-/* Tags & Status */
-.tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  font: var(--caption);
-  border: 1px solid currentColor;
+/* Glass Components */
+.glass-panel {
+  background: var(--panel-bg);
+  backdrop-filter: var(--panel-blur);
+  -webkit-backdrop-filter: var(--panel-blur);
+  border: var(--panel-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
-.tag-gas-giant { color: var(--primary-lt); border-color: var(--primary); }
-.tag-rocky { color: var(--cool); border-color: rgba(59, 139, 212, 0.5); }
-.tag-has-moons { color: #6f9f4a; border-color: rgba(111, 159, 74, 0.5); }
-.tag-dwarf { color: var(--warm); border-color: rgba(232, 89, 60, 0.5); }
-.tag-custom { color: var(--primary); border-color: rgba(83, 74, 183, 0.5); }
+
+.glass-surface {
+  background: var(--surface-bg);
+  border: var(--panel-border);
+  border-radius: var(--radius-sm);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Interactive Elements */
+.interactive-item {
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+}
+.interactive-item:hover {
+  transform: translateX(6px);
+  background: rgba(107, 91, 255, 0.15);
+  border-color: rgba(107, 91, 255, 0.4);
+}
+
+/* Inputs & Buttons */
+input[type="text"], input[type="range"] {
+  outline: none;
+  transition: border-color 0.2s;
+}
+input[type="text"]:focus {
+  border-color: var(--primary);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, #897BFF 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(107, 91, 255, 0.3);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(107, 91, 255, 0.5);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-danger {
+  background: rgba(255, 90, 95, 0.1);
+  color: var(--warm);
+  border: 1px solid rgba(255, 90, 95, 0.2);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-danger:hover {
+  background: rgba(255, 90, 95, 0.2);
+  border-color: rgba(255, 90, 95, 0.4);
+}
+
+/* Tooltip animation */
+.tooltip-anim {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
