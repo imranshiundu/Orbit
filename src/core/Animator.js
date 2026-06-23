@@ -18,7 +18,14 @@ export class Animator {
 
       const state = this.store.getState();
       if (!state.paused) {
-        this.solarSystem.update(delta * state.speed);
+        const urlParams = new URLSearchParams(window.location.search);
+        const isRealTime = urlParams.get('realtime') === 'true';
+        // In our system, speed = 1 means 1 second = 1 day
+        // In real time, 1 second = 1 second. Since 1 day = 86400 seconds,
+        // we multiply delta by (1 / 86400) to get real-time behavior.
+        const timeMultiplier = isRealTime ? (1 / 86400) : state.speed;
+        
+        this.solarSystem.update(delta * timeMultiplier);
       }
 
       this.renderer.render(this.scene, this.camera);
