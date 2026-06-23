@@ -68,9 +68,7 @@ class Store {
         return;
     }
     
-    // Emit a generic change event for UI re-renders
     this.emit('change', this.state);
-    // Emit specific event if necessary
     this.emit(action.type, action);
   }
 
