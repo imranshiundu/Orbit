@@ -37,8 +37,21 @@ export class Planet {
     }
     
     this.mesh.rotation.y = Math.random() * Math.PI * 2;
-
     this.pivot.add(this.mesh);
+
+    // Add Saturn's rings
+    if (data.id === 'saturn') {
+      const ringGeo = new THREE.RingGeometry(radius * 1.2, radius * 2.2, 64);
+      const ringMat = new THREE.MeshBasicMaterial({
+        color: 0xc9b08f,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.6
+      });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = Math.PI / 2;
+      this.mesh.add(ringMesh);
+    }
 
     this.orbitPath = new OrbitPath(distance);
     this.orbitPath.mesh.userData = { id: data.id };
