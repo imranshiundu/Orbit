@@ -14,21 +14,44 @@ export class Planet {
     const radius = scaleSize(data.diameterKm);
     const distance = scaleDistance(data.distanceAU);
 
-    // Planet mesh
     const geometry = new THREE.SphereGeometry(radius, 32, 32);
-    const material = new THREE.MeshStandardMaterial({ color: data.color || 0xffffff });
+    const materialOptions = {};
+    
+    if (data.texture) {
+      import('./TextureLoader.js').then(({ textureLoader }) => {
+        materialOptions.map = textureLoader.load(`/textures/${data.texture}`);
+        this.mesh.material = new THREE.MeshStandardMaterial(materialOptions);
+        this.mesh.material.needsUpdate = true;
+      });
+    } else {
+      materialOptions.color = data.color || 0xffffff;
+    }
+    
+    const material = new THREE.MeshStandardMaterial(materialOptions);
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.position.x = distance;
+    this.mesh.userData = { id: data.id };
     
     if (data.axialTiltDeg) {
       this.mesh.rotation.z = THREE.MathUtils.degToRad(data.axialTiltDeg);
     }
     
+    this.mesh.rotation.y = Math.random() * Math.PI * 2;
+
     this.pivot.add(this.mesh);
 
-    // Orbit path
     this.orbitPath = new OrbitPath(distance);
+    this.orbitPath.mesh.userData = { id: data.id };
     this.scene.add(this.orbitPath.mesh);
+
+    this.moons = [];
+    if (data.moons && data.moons.length > 0) {
+      import('./Moon.js').then(({ Moon }) => {
+        data.moons.forEach(moonData => {
+          this.moons.push(new Moon(moonData, this.mesh));
+        });
+      });
+    }
   }
 
   update(deltaTime) {
@@ -41,9 +64,16 @@ export class Planet {
       const rotationSpeed = (2 * Math.PI) / (this.data.rotationPeriodHours / 24);
       this.mesh.rotation.y += rotationSpeed * deltaTime;
     }
+    
+    if (this.moons) {
+      this.moons.forEach(moon => moon.update(deltaTime));
+    }
   }
 
   destroy() {
+    if (this.moons) {
+      this.moons.forEach(moon => moon.destroy());
+    }
     this.scene.remove(this.pivot);
     this.scene.remove(this.orbitPath.mesh);
     this.mesh.geometry.dispose();
