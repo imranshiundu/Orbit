@@ -151,14 +151,29 @@ orbit/
 - **Phase 4** — Sidebar + SpeedControl wired to Animator, play/pause/speed slider.
 - **Phase 5** — Planet CRUD via PlanetPanel + store, live 3D update.
 - **Phase 6** — Hover raycasting, tooltip component.
-- **Phase 7** — Moon CRUD, MoonPanel.
+- **Phase 7** — Moon CRUD via MoonPanel (configurable name, size, color, distance from planet, orbital period).
 - **Phase 8** — Polish: star particle background, Sun glow sprite, Saturn's rings (TorusGeometry), responsive layout.
+- **Bonus** — Asteroid Belt and Planet Labels toggles integrated directly into the Sidebar UI.
 
-## Bonus Ideas (Flag-gated)
-- Asteroid belt between Mars and Jupiter (instanced particles, `?asteroids=true` query param).
-- Real-time clock mode where simulation time matches actual planetary positions (`?realtime=true`).
-- Mission trajectory — draw a line from one planet to another and animate a spacecraft along it.
-- Labels always visible — 2D CSS labels anchored to 3D positions via `camera.project()`, toggle on/off.
+## Bonus Features (Implemented & Integrated)
+
+Two bonus features are implemented, UI-accessible, and clearly separated from core requirements:
+
+### 🪨 Asteroid Belt
+- A 2,000-particle belt rendered between Mars and Jupiter using `THREE.Points`.
+- Toggled via the **🪨 Asteroids** button in the Sidebar (no URL params needed).
+- Also activatable via `?asteroids=true` query parameter.
+- Implemented in `SolarSystem.createAsteroidBelt()` and `SolarSystem.toggleAsteroidBelt()`.
+
+### 🏷️ Planet Labels
+- 2D CSS labels anchored to 3D planet positions using `camera.project()` on each frame.
+- Toggled via the **🏷 Labels** button in the Sidebar.
+- Also activatable via `?labels=true` query parameter.
+- Implemented in `Animator.updateLabels()`.
+
+### Still Conceptual (Not Implemented)
+- Real-time clock mode (`?realtime=true` is wired but not UI-exposed).
+- Mission trajectory spacecraft animation.
 
 ## Getting Started
 

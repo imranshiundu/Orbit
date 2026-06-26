@@ -1,68 +1,80 @@
 # Orbit - Build Progress
 
-This document tracks the current state of the repository, detailing what has been structured, what is partially coded, and what remains to be built according to the Master Build Plan.
+## ✅ All Core Requirements — COMPLETE
 
-## 🏗️ What is Built & Structured So Far
+### Phase 1 — Scene Foundation ✅
+- Three.js scene, PerspectiveCamera, WebGLRenderer, OrbitControls wired in `scene.js`
+- AmbientLight + Sun PointLight for realistic lighting
+- Camera controls tuned: `minDistance`, `maxDistance`, `rotateSpeed`, `zoomSpeed`, `screenSpacePanning`
+- Pixel ratio capped at 2× for consistent performance
 
-### 1. Foundation & Architecture
-- **Git History**: Chronological, well-documented git timeline simulating progressive builds.
-- **Repository Skeleton**: All directories and files mapped out identically to the architecture diagram (`src/core`, `src/ui`, `src/utils`, `src/data`, `src/assets`).
-- **Configuration**: `package.json` with dependencies mapped (`three`, `vite`), and `vite.config.js` set up for dev server and build.
-- **HTML/CSS Entry**: `index.html` shell mounting `#app` and `style.css` configured with exact Design System tokens.
-- **Data Source**: `planets.json` created with default schema (Earth & Moon).
+### Phase 2 — Planets & Sun ✅
+- All 8 planets + Pluto with real textures (`2k_*.jpg`)
+- Logarithmic distance scaling + sqrt size scaling (`scaling.js`)
+- Axial tilt, self-rotation, and orbital period all implemented
+- Saturn rings via `RingGeometry`
 
-### 2. Design System (`src/style.css`)
-Fully implemented CSS Custom Properties containing:
-- Complete color palette (Space, Panel, Surface, Primary, Sun, Warm, Cool, etc.).
-- Typography scale (h1, h2, h3, body, caption, mono).
-- Spacing scale variables (4px to 48px).
-- Border radius variables (sm, md, lg, pill).
+### Phase 3 — Moons ✅
+- `Moon.js` with pivot group nested inside planet mesh for correct relative orbiting
+- Earth's Moon, configurable moons per planet
+- Moon orbit paths rendered alongside planet
 
-### 3. State Management (`src/store.js`)
-- Full robust `EventEmitter` pattern implemented.
-- Handles UI actions via `store.dispatch(action)`.
-- Implements Redux-like flow: `SET_PLANETS`, `ADD_PLANET`, `UPDATE_PLANET`, `DELETE_PLANET`, `SET_SPEED`, `SET_PAUSED`, `SET_SELECTED`, `SET_HOVERED`.
-- State shape holds `planets[]`, `speed`, `paused`, `selectedId`, and `hoveredId`.
+### Phase 4 — Speed Controls ✅
+- `SpeedControl.js`: Play/Pause button + speed slider (0–5×)
+- Wired to `store.speed` and `store.paused`
+- `?realtime=true` query param mode also supported
 
-### 4. Basic Core Scaffolds (Partially Coded)
-- `Planet.js` & `Moon.js`: Initial classes with data passing and `update()` methods.
-- `Sun.js`: Initial class to hold mesh and point light initialization.
-- `SolarSystem.js`: Orchestrator class holding Sun and arrays of Planets.
-- `Animator.js`: requestAnimationFrame loop with `deltaTime` calculation stubbed.
-- `Sidebar.js`: Initial UI component setup injected into the DOM.
-- `main.js`: Basic bootstrapper.
+### Phase 5 — Planet CRUD ✅
+- `PlanetPanel.js`: Create, Edit, Delete planets
+- Configurable: name, size (km), color, orbital speed (days), distance (AU)
+- Sliders no longer reset mid-drag (drag-guard implemented)
+- Saving no longer stops animation (pivot rotation preserved across rebuilds)
 
-## 🚧 What is Left to Build (Next Phases)
+### Phase 6 — Hover & Tooltip ✅
+- `raycaster.js` fires rays on `mousemove` against all planet/moon meshes
+- `Tooltip.js` displays name, size (km), distance (AU or km from planet)
+- Follows mouse cursor position in real-time
 
-### 5. Render Core (Three.js Engine)
-- **Scene Setup (`scene.js`)**: WebGLRenderer, Scene, PerspectiveCamera, OrbitControls, and AmbientLight are configured and wired into `main.js`.
-- **Scaling (`scaling.js`)**: Logarithmic scale helper for distance, square-root scale helper for sizes.
-- **Engine Logic**: `Animator.js` requestAnimationFrame loop calculating proper delta time. `SolarSystem.js` instantiates and manages the Sun and Planets.
-- **Entities**: `Sun.js` (Mesh + PointLight), `Planet.js` (Pivot Group, Mesh, correct orbital and axial rotation logic), `OrbitPath.js` (RingGeometry).
+### Phase 7 — Moon CRUD ✅ *(was declined — now implemented)*
+- `MoonPanel.js`: Full moon editor — configurable **name, size, color, distance from planet, orbital period**
+- "Add Moon" in PlanetPanel opens MoonPanel form (not random any more)
+- Each moon row in PlanetPanel has ✏️ Edit and ✕ Delete buttons
+- Moon changes patched in-place via `Planet.rebuildMoons()` — **no freeze, no full planet rebuild**
+- `_moonsOnly: true` flag routes updates through `SolarSystem.updatePlanetMoons()`
 
-## 🚧 What is Left to Build (Next Phases)
+### Phase 8 — Polish ✅
+- Star particle background (3,000 points)
+- Sun glow (emissive material + PointLight)
+- Saturn's rings (RingGeometry)
 
-### Phase 3: Textures and Assets
-- Implement `TextureLoader.js` singleton.
-- Map Earth's texture inside `Planet.js`.
-- Bring in the other default planets from `planets.json`.
+---
 
-### Phase 4: Moons Integration
-- Connect `Moon.js` into `Planet.js` pivot groups.
-- Set up the nested orbiting logic.
+## ✅ Bug Fixes Applied
 
-### Phase 5: UI & CRUD Interactivity
-- Build out `PlanetPanel.js` form with the ranges and sliders.
-- Build out `SpeedControl.js` (Play/Pause, Speed slider).
-- Build `Sidebar.js` planet list rendering logic syncing directly with `store.js`.
-- Wire the UI dispatches to create/delete/update instances in the `SolarSystem`.
+| Bug | Fix |
+|-----|-----|
+| `TypeError: target.setFromMatrixPosition` on planet click | `getWorldPosition()` now receives `new THREE.Vector3()` not `{}` |
+| Sliders snap back while dragging | `_isDragging` guard in PlanetPanel/MoonPanel skips re-render during drag |
+| Animation stops after Save | `pivot.rotation.y` preserved across `UPDATE_PLANET` rebuild |
+| Moons not appearing after add | Replaced async `import('./Moon.js')` with static imports (synchronous) |
+| Freeze when adding a moon | Moon changes patched in-place — no full planet destroy/rebuild |
+| Camera stuck, fights user input | One-shot 60-frame focus animation on selection change; full control returned after |
+| Camera clips through sun / flies away | `minDistance: 20`, `maxDistance: 2500` limits added |
 
-### Phase 6: Hover & Interaction
-- Implement `utils/raycaster.js` to fire rays on `mousemove`.
-- Implement `ui/Tooltip.js` to track `hoveredId` and show planet details.
+---
 
-### Phase 7: Polish & Bonuses
-- Star background particle system.
-- Saturn rings (`TorusGeometry`).
-- Moons panel UI (`MoonPanel.js`).
-- Implement bonus flags (Asteroids, Realtime clock).
+## ✅ Bonus Features — Integrated & Discoverable
+
+### 🪨 Asteroid Belt
+- 2,000-particle belt between Mars and Jupiter (`THREE.Points`)
+- Toggle button in the Sidebar — **no URL params needed**
+- Also activatable via `?asteroids=true`
+- Implementation: `SolarSystem.createAsteroidBelt()` / `SolarSystem.toggleAsteroidBelt()`
+
+### 🏷️ Planet Labels
+- 2D CSS labels anchored to live 3D planet positions via `camera.project()`
+- Toggle button in the Sidebar — **no URL params needed**
+- Also activatable via `?labels=true`
+- Implementation: `Animator.updateLabels()`
+
+Both bonus features are clearly separated from core CRUD and simulation logic.
