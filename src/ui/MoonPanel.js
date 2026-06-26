@@ -25,23 +25,26 @@ export class MoonPanel {
     this._currentPlanetId = null;
     this._currentMoonIndex = null;
     this.container.innerHTML = '';
+    this.container.style.pointerEvents = 'none';
   }
 
   _render() {
     const planetId = this._currentPlanetId;
     const moonIndex = this._currentMoonIndex;
-    if (!planetId) { this.container.innerHTML = ''; return; }
+    if (!planetId) { this.container.innerHTML = ''; this.container.style.pointerEvents = 'none'; return; }
 
     const state = this.store.getState();
     const planet = state.planets.find(p => p.id === planetId);
-    if (!planet) { this.container.innerHTML = ''; return; }
+    if (!planet) { this.container.innerHTML = ''; this.container.style.pointerEvents = 'none'; return; }
 
     const isNew = moonIndex === 'new';
     const moon = isNew
       ? { name: 'New Moon', diameterKm: 1500, color: '#b0b0b0', distancePlanetKm: 200000, orbitalPeriodDays: 15 }
       : (planet.moons || [])[moonIndex];
 
-    if (!moon && !isNew) { this.container.innerHTML = ''; return; }
+    if (!moon && !isNew) { this.container.innerHTML = ''; this.container.style.pointerEvents = 'none'; return; }
+
+    this.container.style.pointerEvents = 'auto';
 
     this.container.innerHTML = `
       <div class="planet-panel glass-panel" style="padding: var(--space-4); color: var(--text); height: 100%; overflow-y: auto;">

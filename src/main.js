@@ -14,7 +14,7 @@ app.innerHTML = `
   <canvas id="glcanvas"></canvas>
   <div id="labels-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 10;"></div>
   <div id="sidebar-container" style="position: absolute; top: var(--space-4); right: var(--space-4); bottom: var(--space-4); width: 320px;"></div>
-  <div id="panel-container" style="position: absolute; top: var(--space-4); right: calc(320px + var(--space-4) * 2); bottom: var(--space-4); width: 320px;"></div>
+  <div id="panel-container" style="position: absolute; top: var(--space-4); right: calc(320px + var(--space-4) * 2); bottom: var(--space-4); width: 320px; pointer-events: none;"></div>
   <div id="tooltip-container" style="position: absolute; top: 0; left: 0; pointer-events: none;"></div>
 `;
 

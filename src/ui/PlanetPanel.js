@@ -12,7 +12,7 @@ export class PlanetPanel {
     // We create a sibling div for it dynamically.
     this._moonPanelContainer = document.createElement('div');
     this._moonPanelContainer.style.cssText =
-      'position: absolute; top: var(--space-4); right: calc(640px + var(--space-4) * 3); bottom: var(--space-4); width: 300px;';
+      'position: absolute; top: var(--space-4); right: calc(640px + var(--space-4) * 3); bottom: var(--space-4); width: 300px; pointer-events: none;';
     document.body.appendChild(this._moonPanelContainer);
     this._moonPanel = new MoonPanel(this._moonPanelContainer, store);
   }
@@ -25,9 +25,12 @@ export class PlanetPanel {
       this._isDragging = false;
       this._lastRenderedId = null;
       this.container.innerHTML = '';
+      this.container.style.pointerEvents = 'none';
       this._moonPanel.close();
       return;
     }
+
+    this.container.style.pointerEvents = 'auto';
 
     // Skip full re-render while a slider is being dragged
     if (this._isDragging && this._lastRenderedId === selectedId) {
