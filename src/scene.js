@@ -13,9 +13,9 @@ export function setupScene(canvas) {
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
-  controls.rotateSpeed = 0.6;
-  controls.zoomSpeed = 1.2;
+  controls.dampingFactor = 0.05;
+  controls.rotateSpeed = 0.5;
+  controls.zoomSpeed = 0.4;
   controls.panSpeed = 0.8;
   controls.minDistance = 20;     // don't crash into the sun
   controls.maxDistance = 2500;   // don't fly off to infinity

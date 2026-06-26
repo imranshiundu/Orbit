@@ -48,7 +48,7 @@ export class Sidebar {
           <span style="font-size:13px;">${p.name}</span>
         </div>
         ${p.moons && p.moons.length > 0
-          ? `<span class="caption" style="opacity:0.4;font-size:11px;">${p.moons.length}🌙</span>`
+          ? `<span class="caption" style="opacity:0.4;font-size:11px;">${p.moons.length} moon(s)</span>`
           : ''}
       </div>
     `).join('');
@@ -58,7 +58,7 @@ export class Sidebar {
         display: flex; flex-direction: column; height: 100%; overflow: hidden;">
 
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-3);">
-          <h2 class="h2" style="color: var(--primary-lt); font-size:16px;">🌌 Solar System</h2>
+          <h2 class="h2" style="color: var(--primary-lt); font-size:16px;">Solar System</h2>
           <span class="caption" style="opacity:0.4;">${state.planets.length} bodies</span>
         </div>
 
@@ -74,10 +74,10 @@ export class Sidebar {
         <!-- Bonus toggles -->
         <div style="margin-top: var(--space-2); display: flex; gap: var(--space-1);">
           <button id="toggle-asteroids-btn" class="bonus-toggle ${this._asteroids ? 'active' : ''}"
-            title="Toggle Asteroid Belt">🪨</button>
+            title="Toggle Asteroid Belt" style="font-size: 11px;">Asteroids</button>
           <button id="toggle-labels-btn" class="bonus-toggle ${this._labels ? 'active' : ''}"
-            title="Toggle Planet Labels">🏷</button>
-          <button id="btn-reset-cam" class="bonus-toggle" title="Reset camera view">🏠</button>
+            title="Toggle Planet Labels" style="font-size: 11px;">Labels</button>
+          <button id="btn-reset-cam" class="bonus-toggle" title="Reset camera view" style="font-size: 11px;">Reset</button>
         </div>
 
         <!-- Keyboard hint -->

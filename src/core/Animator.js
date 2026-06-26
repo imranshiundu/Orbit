@@ -92,12 +92,17 @@ export class Animator {
     const startTarget = this.controls.target.clone();
     const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in-out
 
+    // Stylish arc for movement
+    const midPos = startPos.clone().lerp(targetPos, 0.5);
+    midPos.y += startPos.distanceTo(targetPos) * 0.2; // Add height to arc
+    const curve = new THREE.QuadraticBezierCurve3(startPos, midPos, targetPos);
+
     const animate = () => {
       if (f >= frames) return;
       f++;
       const t = ease(f / frames);
 
-      this.camera.position.lerpVectors(startPos, targetPos, t);
+      this.camera.position.copy(curve.getPoint(t));
       this.controls.target.lerpVectors(startTarget, targetLook, t);
       this.controls.update();
       requestAnimationFrame(animate);
