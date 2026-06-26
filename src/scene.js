@@ -5,15 +5,21 @@ export function setupScene(canvas) {
   const scene = new THREE.Scene();
 
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
-  camera.position.set(0, 400, 800);
+  camera.position.set(0, 300, 600);
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // cap at 2× to avoid GPU overload
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
+  controls.dampingFactor = 0.08;
+  controls.rotateSpeed = 0.6;
+  controls.zoomSpeed = 1.2;
+  controls.panSpeed = 0.8;
+  controls.minDistance = 20;     // don't crash into the sun
+  controls.maxDistance = 2500;   // don't fly off to infinity
+  controls.screenSpacePanning = true; // pan feels natural (not tilt-based)
 
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
   scene.add(ambientLight);

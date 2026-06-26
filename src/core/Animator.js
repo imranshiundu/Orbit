@@ -10,6 +10,9 @@ export class Animator {
     this.controls = controls;
     this.lastTime = performance.now();
     this.rafId = null;
+
+    // Track the last selected ID so we only re-focus when the selection actually changes
+    this._lastSelectedId = undefined;
   }
 
   start() {
@@ -26,7 +29,7 @@ export class Animator {
         this.solarSystem.update(delta * timeMultiplier);
       }
 
-      this.focusSelectedPlanet(state);
+      this._handleSelectionChange(state);
       if (this.controls) this.controls.update();
       this.renderer.render(this.scene, this.camera);
       this.updateLabels();
@@ -35,26 +38,54 @@ export class Animator {
     this.rafId = requestAnimationFrame(tick);
   }
 
-  focusSelectedPlanet(state) {
-    if (!this.controls) return;
+  /**
+   * When the selected planet CHANGES, smoothly animate the camera target toward it
+   * for ~1 second (60 frames). After that, the user has full control — we don't
+   * keep fighting them every frame.
+   */
+  _handleSelectionChange(state) {
     const { selectedId } = state;
-    const zero = { x: 0, y: 0, z: 0 };
-    const target = this.controls.target;
+
+    if (selectedId === this._lastSelectedId) return; // no change, nothing to do
+    this._lastSelectedId = selectedId;
+
+    if (!this.controls) return;
 
     if (selectedId && selectedId !== 'new') {
       const planet = this.solarSystem.planets.get(selectedId);
-      if (planet) {
+      if (!planet) return;
+
+      // Animate target toward the planet over ~60 frames
+      let frames = 0;
+      const maxFrames = 60;
+
+      const animate = () => {
+        if (frames >= maxFrames) return;
+        frames++;
+
         const pos = new THREE.Vector3();
         planet.mesh.getWorldPosition(pos);
-        target.x += (pos.x - target.x) * 0.05;
-        target.y += (pos.y - target.y) * 0.05;
-        target.z += (pos.z - target.z) * 0.05;
-        return;
-      }
+        this.controls.target.x += (pos.x - this.controls.target.x) * 0.1;
+        this.controls.target.y += (pos.y - this.controls.target.y) * 0.1;
+        this.controls.target.z += (pos.z - this.controls.target.z) * 0.1;
+
+        requestAnimationFrame(animate);
+      };
+      requestAnimationFrame(animate);
+    } else {
+      // Return to origin
+      let frames = 0;
+      const maxFrames = 60;
+      const animate = () => {
+        if (frames >= maxFrames) return;
+        frames++;
+        this.controls.target.x += (0 - this.controls.target.x) * 0.1;
+        this.controls.target.y += (0 - this.controls.target.y) * 0.1;
+        this.controls.target.z += (0 - this.controls.target.z) * 0.1;
+        requestAnimationFrame(animate);
+      };
+      requestAnimationFrame(animate);
     }
-    target.x += (zero.x - target.x) * 0.05;
-    target.y += (zero.y - target.y) * 0.05;
-    target.z += (zero.z - target.z) * 0.05;
   }
 
   updateLabels() {
@@ -66,34 +97,32 @@ export class Animator {
       this.labelElements = new Map();
     }
 
-    import('three').then((THREE) => {
-      this.solarSystem.planets.forEach((planet, id) => {
-        const pos = new THREE.Vector3();
-        planet.mesh.getWorldPosition(pos);
-        pos.project(this.camera);
+    this.solarSystem.planets.forEach((planet, id) => {
+      const pos = new THREE.Vector3();
+      planet.mesh.getWorldPosition(pos);
+      pos.project(this.camera);
 
-        const x = (pos.x * .5 + .5) * window.innerWidth;
-        const y = (pos.y * -.5 + .5) * window.innerHeight;
+      const x = (pos.x * .5 + .5) * window.innerWidth;
+      const y = (pos.y * -.5 + .5) * window.innerHeight;
 
-        if (!this.labelElements.has(id)) {
-          const el = document.createElement('div');
-          el.style.position = 'absolute';
-          el.style.color = 'white';
-          el.style.fontSize = '12px';
-          el.style.textShadow = '0 0 3px black';
-          el.textContent = planet.data.name;
-          this.labelsContainer.appendChild(el);
-          this.labelElements.set(id, el);
-        }
-        
-        const el = this.labelElements.get(id);
-        if (pos.z > 1) {
-          el.style.display = 'none';
-        } else {
-          el.style.display = 'block';
-          el.style.transform = `translate(${x}px, ${y - 20}px)`;
-        }
-      });
+      if (!this.labelElements.has(id)) {
+        const el = document.createElement('div');
+        el.style.position = 'absolute';
+        el.style.color = 'white';
+        el.style.fontSize = '12px';
+        el.style.textShadow = '0 0 3px black';
+        el.textContent = planet.data.name;
+        this.labelsContainer.appendChild(el);
+        this.labelElements.set(id, el);
+      }
+
+      const el = this.labelElements.get(id);
+      if (pos.z > 1) {
+        el.style.display = 'none';
+      } else {
+        el.style.display = 'block';
+        el.style.transform = `translate(${x}px, ${y - 20}px)`;
+      }
     });
   }
 

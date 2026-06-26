@@ -89,4 +89,22 @@ export class Planet {
     this.orbitPath.mesh.geometry.dispose();
     this.orbitPath.mesh.material.dispose();
   }
+
+  /**
+   * Destroy all current moon 3D objects and rebuild from new data array.
+   * Called by SolarSystem.updatePlanetMoons() — no planet rebuild needed.
+   */
+  rebuildMoons(moonsData = []) {
+    // Destroy all existing moon objects
+    if (this.moons) {
+      this.moons.forEach(moon => moon.destroy());
+    }
+    this.moons = [];
+    // Rebuild from new data
+    moonsData.forEach(moonData => {
+      this.moons.push(new Moon(moonData, this.mesh));
+    });
+    // Also keep the planet's data.moons in sync for tooltip/sidebar
+    this.data.moons = moonsData;
+  }
 }

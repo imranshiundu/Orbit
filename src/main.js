@@ -4,6 +4,9 @@ import { setupScene } from './scene.js';
 import { SolarSystem } from './core/SolarSystem.js';
 import { Animator } from './core/Animator.js';
 import { Sidebar } from './ui/Sidebar.js';
+import { PlanetPanel } from './ui/PlanetPanel.js';
+import { Tooltip } from './ui/Tooltip.js';
+import { RaycasterManager } from './utils/raycaster.js';
 import planetsData from './data/planets.json';
 
 const app = document.querySelector('#app');
@@ -23,16 +26,15 @@ solarSystem.init();
 
 const animator = new Animator(solarSystem, renderer, scene, camera, store, controls);
 
+// Expose solarSystem to the Sidebar for the asteroid toggle button
+window._solarSystem = solarSystem;
+
 store.dispatch({ type: 'SET_PLANETS', payload: planetsData });
 planetsData.forEach(p => solarSystem.addPlanet(p));
 
 const sidebarContainer = document.getElementById('sidebar-container');
 const sidebar = new Sidebar(sidebarContainer, store);
 sidebar.render();
-
-import { PlanetPanel } from './ui/PlanetPanel.js';
-import { Tooltip } from './ui/Tooltip.js';
-import { RaycasterManager } from './utils/raycaster.js';
 
 const panelContainer = document.getElementById('panel-container');
 const planetPanel = new PlanetPanel(panelContainer, store);
@@ -51,7 +53,16 @@ store.on('change', () => {
 
 store.on('ADD_PLANET', (action) => solarSystem.addPlanet(action.payload));
 store.on('DELETE_PLANET', (action) => solarSystem.removePlanet(action.id));
+
 store.on('UPDATE_PLANET', (action) => {
+  // If only moons changed, patch them in-place to avoid the full planet rebuild freeze
+  if (action._moonsOnly) {
+    const state = store.getState();
+    const planetData = state.planets.find(p => p.id === action.id);
+    if (planetData) solarSystem.updatePlanetMoons(action.id, planetData.moons || []);
+    return;
+  }
+  // Full planet rebuild for geometry/material changes (size, distance, color, etc.)
   const savedRotation = solarSystem.removePlanet(action.id);
   const state = store.getState();
   const planetData = state.planets.find(p => p.id === action.id);
