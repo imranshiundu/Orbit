@@ -37,6 +37,75 @@ export class Sidebar {
   render() {
     const state = this.store.getState();
 
+    if (!this._initialized) {
+      this.container.innerHTML = `
+        <div class="sidebar glass-panel" style="padding: var(--space-3); color: var(--text); display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-3);">
+            <h2 class="h2" style="color: var(--primary-lt); font-size:16px;">Solar System</h2>
+            <span id="body-count" class="caption" style="opacity:0.4;"></span>
+          </div>
+
+          <div id="planet-list" style="flex: 1; overflow-y: auto; padding-right: 2px; min-height: 0;"></div>
+
+          <button id="add-planet-btn" class="btn-secondary" style="width: 100%; margin-top: var(--space-3); font-size:13px; padding:8px;">
+            + Add Planet
+          </button>
+
+          <div style="margin-top: var(--space-2); display: flex; gap: var(--space-1);">
+            <button id="toggle-asteroids-btn" class="bonus-toggle" title="Toggle Asteroid Belt" style="font-size: 11px;">Asteroids</button>
+            <button id="toggle-labels-btn" class="bonus-toggle" title="Toggle Planet Labels" style="font-size: 11px;">Labels</button>
+            <button id="btn-reset-cam" class="bonus-toggle" title="Reset camera view" style="font-size: 11px;">Reset</button>
+          </div>
+
+          <div style="margin-top:var(--space-2); padding:6px 8px; background:rgba(255,255,255,0.03); border-radius:var(--radius-sm); font-size:10px; color:rgba(255,255,255,0.3); line-height:1.6;">
+            <strong style="color:rgba(255,255,255,0.5)">Navigation shortcuts</strong><br>
+            <kbd>F</kbd> focus &nbsp; <kbd>H</kbd> home &nbsp; <kbd>R</kbd> reset &nbsp;<br>
+            <kbd>+/-</kbd> zoom &nbsp; Double-click planet to focus
+          </div>
+
+          <div id="speed-control-container"></div>
+        </div>
+      `;
+
+      this.container.querySelector('#add-planet-btn').addEventListener('click', () => {
+        this.store.dispatch({ type: 'SET_SELECTED', id: 'new' });
+      });
+
+      this.container.querySelector('#toggle-asteroids-btn').addEventListener('click', () => {
+        const ss = window._solarSystem;
+        if (ss) {
+          this._asteroids = ss.toggleAsteroidBelt();
+          this.render();
+        }
+      });
+
+      this.container.querySelector('#toggle-labels-btn').addEventListener('click', () => {
+        this._labels = !this._labels;
+        const url = new URL(window.location.href);
+        if (this._labels) {
+          url.searchParams.set('labels', 'true');
+        } else {
+          url.searchParams.delete('labels');
+          const lc = document.getElementById('labels-container');
+          if (lc) lc.innerHTML = '';
+        }
+        window.history.replaceState({}, '', url.toString());
+        this.render();
+      });
+
+      this.container.querySelector('#btn-reset-cam').addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('orbit:reset-camera'));
+      });
+
+      const speedContainer = this.container.querySelector('#speed-control-container');
+      this.speedControl = new SpeedControl(speedContainer, this.store);
+
+      this._initialized = true;
+    }
+
+    // Dynamic Updates
+    this.container.querySelector('#body-count').textContent = `${state.planets.length} bodies`;
+
     const planetsHtml = state.planets.map(p => `
       <div class="planet-item interactive-item glass-surface" data-id="${p.id}"
         style="padding: var(--space-2); margin-bottom: var(--space-1); display: flex;
@@ -53,91 +122,22 @@ export class Sidebar {
       </div>
     `).join('');
 
-    this.container.innerHTML = `
-      <div class="sidebar glass-panel" style="padding: var(--space-3); color: var(--text);
-        display: flex; flex-direction: column; height: 100%; overflow: hidden;">
+    const listEl = this.container.querySelector('#planet-list');
+    listEl.innerHTML = planetsHtml;
 
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-3);">
-          <h2 class="h2" style="color: var(--primary-lt); font-size:16px;">Solar System</h2>
-          <span class="caption" style="opacity:0.4;">${state.planets.length} bodies</span>
-        </div>
-
-        <div id="planet-list" style="flex: 1; overflow-y: auto; padding-right: 2px; min-height: 0;">
-          ${planetsHtml}
-        </div>
-
-        <button id="add-planet-btn" class="btn-secondary"
-          style="width: 100%; margin-top: var(--space-3); font-size:13px; padding:8px;">
-          + Add Planet
-        </button>
-
-        <!-- Bonus toggles -->
-        <div style="margin-top: var(--space-2); display: flex; gap: var(--space-1);">
-          <button id="toggle-asteroids-btn" class="bonus-toggle ${this._asteroids ? 'active' : ''}"
-            title="Toggle Asteroid Belt" style="font-size: 11px;">Asteroids</button>
-          <button id="toggle-labels-btn" class="bonus-toggle ${this._labels ? 'active' : ''}"
-            title="Toggle Planet Labels" style="font-size: 11px;">Labels</button>
-          <button id="btn-reset-cam" class="bonus-toggle" title="Reset camera view" style="font-size: 11px;">Reset</button>
-        </div>
-
-        <!-- Keyboard hint -->
-        <div style="margin-top:var(--space-2); padding:6px 8px; background:rgba(255,255,255,0.03);
-          border-radius:var(--radius-sm); font-size:10px; color:rgba(255,255,255,0.3); line-height:1.6;">
-          <strong style="color:rgba(255,255,255,0.5)">Navigation shortcuts</strong><br>
-          <kbd>F</kbd> focus planet &nbsp;
-          <kbd>H</kbd> home &nbsp;
-          <kbd>R</kbd> reset &nbsp;<br>
-          <kbd>+/-</kbd> zoom &nbsp;
-          Double-click planet to focus
-        </div>
-
-        <div id="speed-control-container"></div>
-      </div>
-    `;
-
-    // Speed control
-    const speedContainer = this.container.querySelector('#speed-control-container');
-    const speedControl = new SpeedControl(speedContainer, this.store);
-    speedControl.render();
-
-    // Planet click → select
-    this.container.querySelectorAll('.planet-item').forEach(el => {
+    listEl.querySelectorAll('.planet-item').forEach(el => {
       el.addEventListener('click', () => {
         this.store.dispatch({ type: 'SET_SELECTED', id: el.dataset.id });
       });
     });
 
-    this.container.querySelector('#add-planet-btn').addEventListener('click', () => {
-      this.store.dispatch({ type: 'SET_SELECTED', id: 'new' });
-    });
+    const astBtn = this.container.querySelector('#toggle-asteroids-btn');
+    if (this._asteroids) astBtn.classList.add('active'); else astBtn.classList.remove('active');
 
-    // Asteroid belt toggle
-    this.container.querySelector('#toggle-asteroids-btn').addEventListener('click', () => {
-      const ss = window._solarSystem;
-      if (ss) {
-        this._asteroids = ss.toggleAsteroidBelt();
-        this.render();
-      }
-    });
+    const lblBtn = this.container.querySelector('#toggle-labels-btn');
+    if (this._labels) lblBtn.classList.add('active'); else lblBtn.classList.remove('active');
 
-    // Labels toggle
-    this.container.querySelector('#toggle-labels-btn').addEventListener('click', () => {
-      this._labels = !this._labels;
-      const url = new URL(window.location.href);
-      if (this._labels) {
-        url.searchParams.set('labels', 'true');
-      } else {
-        url.searchParams.delete('labels');
-        const lc = document.getElementById('labels-container');
-        if (lc) lc.innerHTML = '';
-      }
-      window.history.replaceState({}, '', url.toString());
-      this.render();
-    });
-
-    // Reset camera
-    this.container.querySelector('#btn-reset-cam').addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('orbit:reset-camera'));
-    });
+    this.speedControl.render();
+  }
   }
 }

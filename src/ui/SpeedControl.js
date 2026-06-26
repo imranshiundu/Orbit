@@ -2,12 +2,15 @@ export class SpeedControl {
   constructor(container, store) {
     this.container = container;
     this.store = store;
+    this._isDragging = false;
   }
 
   render() {
     const state = this.store.getState();
     const paused = state.paused;
     const speed = state.speed;
+
+    if (this._isDragging) return;
 
     // Speed presets: label → value
     const presets = [
@@ -53,8 +56,16 @@ export class SpeedControl {
       });
     });
 
-    // Slider (no store dispatch mid-drag to keep UI stable)
+    // Slider
     const slider = this.container.querySelector('#speed-slider');
+    slider.addEventListener('mousedown', () => { this._isDragging = true; });
+    slider.addEventListener('touchstart', () => { this._isDragging = true; }, { passive: true });
+    
+    const stopDrag = () => { this._isDragging = false; };
+    slider.addEventListener('mouseup', stopDrag);
+    slider.addEventListener('touchend', stopDrag);
+    window.addEventListener('mouseup', stopDrag);
+
     slider.addEventListener('input', (e) => {
       this.store.dispatch({ type: 'SET_SPEED', payload: parseFloat(e.target.value) });
     });
