@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap');
+
 :root {
   /* Color Palette */
   --space: #050508;
@@ -9,16 +11,15 @@
   --warm: #FF5A5F;
   --cool: #00D2FF;
 
-  /* Glassmorphism Variables */
-  --panel-bg: rgba(10, 10, 18, 0.65);
+  /* Glassmorphism */
+  --panel-bg: rgba(10, 10, 18, 0.70);
   --surface-bg: rgba(255, 255, 255, 0.05);
-  --panel-blur: blur(16px);
+  --panel-blur: blur(20px);
   --panel-border: 1px solid rgba(255, 255, 255, 0.08);
 
   /* Typography */
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  
   --h1: 600 24px var(--font-family);
   --h2: 600 20px var(--font-family);
   --h3: 500 16px var(--font-family);
@@ -39,11 +40,7 @@
   --radius-pill: 99px;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   background-color: var(--space);
@@ -59,49 +56,82 @@ body {
   position: relative;
 }
 
-/* Typography Utility Classes */
+/* ── Typography ──────────────────────────────────────────────────────────── */
 .h1 { font: var(--h1); letter-spacing: -0.5px; }
 .h2 { font: var(--h2); letter-spacing: -0.3px; }
 .h3 { font: var(--h3); }
 .caption { font: var(--caption); color: var(--muted); }
 .mono { font: var(--mono); }
 
-/* Glass Components */
+/* ── Glass components ────────────────────────────────────────────────────── */
 .glass-panel {
   background: var(--panel-bg);
   backdrop-filter: var(--panel-blur);
   -webkit-backdrop-filter: var(--panel-blur);
   border: var(--panel-border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
 .glass-surface {
   background: var(--surface-bg);
   border: var(--panel-border);
   border-radius: var(--radius-sm);
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Interactive Elements */
+/* ── Sidebar container — slide animation ─────────────────────────────────── */
+#sidebar-container {
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* ── Sidebar toggle button (floating, right-edge) ────────────────────────── */
+#sidebar-toggle {
+  position: fixed;
+  top: 50%;
+  right: 344px; /* 320px sidebar + 24px gap */
+  transform: translateY(-50%);
+  z-index: 200;
+  width: 28px;
+  height: 52px;
+  background: rgba(107, 91, 255, 0.18);
+  border: 1px solid rgba(107, 91, 255, 0.35);
+  border-radius: 8px 0 0 8px;
+  color: var(--primary-lt);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+#sidebar-toggle:hover {
+  background: rgba(107, 91, 255, 0.35);
+  width: 32px;
+}
+#sidebar-toggle.sidebar-hidden {
+  right: 0;
+  border-radius: 8px 0 0 8px;
+  background: rgba(107, 91, 255, 0.25);
+}
+
+/* ── Interactive planet items ────────────────────────────────────────────── */
 .interactive-item {
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   cursor: pointer;
 }
 .interactive-item:hover {
-  transform: translateX(6px);
-  background: rgba(107, 91, 255, 0.15);
-  border-color: rgba(107, 91, 255, 0.4);
+  transform: translateX(4px);
+  background: rgba(107, 91, 255, 0.12);
+  border-color: rgba(107, 91, 255, 0.35) !important;
 }
 
-/* Inputs & Buttons */
-input[type="text"], input[type="range"] {
-  outline: none;
-  transition: border-color 0.2s;
-}
-input[type="text"]:focus {
-  border-color: var(--primary);
-}
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
+input[type="text"] { outline: none; transition: border-color 0.2s; }
+input[type="text"]:focus { border-color: var(--primary); }
 
 .btn-primary {
   background: linear-gradient(135deg, var(--primary) 0%, #897BFF 100%);
@@ -110,17 +140,13 @@ input[type="text"]:focus {
   border-radius: var(--radius-md);
   padding: 10px 16px;
   font-weight: 500;
+  font-family: var(--font-family);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
   box-shadow: 0 4px 15px rgba(107, 91, 255, 0.3);
 }
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(107, 91, 255, 0.5);
-}
-.btn-primary:active {
-  transform: translateY(1px);
-}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(107, 91, 255, 0.5); }
+.btn-primary:active { transform: translateY(1px) scale(0.98); }
 
 .btn-secondary {
   background: rgba(255, 255, 255, 0.05);
@@ -129,13 +155,12 @@ input[type="text"]:focus {
   border-radius: var(--radius-md);
   padding: 8px 12px;
   font-weight: 500;
+  font-family: var(--font-family);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.18s, border-color 0.18s, transform 0.15s;
 }
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-}
+.btn-secondary:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.2); transform: translateY(-1px); }
+.btn-secondary:active { transform: scale(0.97); }
 
 .btn-danger {
   background: rgba(255, 90, 95, 0.1);
@@ -144,19 +169,144 @@ input[type="text"]:focus {
   border-radius: var(--radius-md);
   padding: 8px 12px;
   font-weight: 500;
+  font-family: var(--font-family);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.18s, border-color 0.18s;
 }
-.btn-danger:hover {
-  background: rgba(255, 90, 95, 0.2);
-  border-color: rgba(255, 90, 95, 0.4);
+.btn-danger:hover { background: rgba(255, 90, 95, 0.22); border-color: rgba(255, 90, 95, 0.45); }
+.btn-danger:active { transform: scale(0.97); }
+
+/* ── Bonus toggle icon buttons ───────────────────────────────────────────── */
+.bonus-toggle {
+  flex: 1;
+  padding: 7px 4px;
+  font-size: 16px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bonus-toggle:hover { background: rgba(255,255,255,0.1); transform: scale(1.08); }
+.bonus-toggle:active { transform: scale(0.92); }
+.bonus-toggle.active {
+  background: rgba(107, 91, 255, 0.25);
+  border-color: rgba(107, 91, 255, 0.6);
+  box-shadow: 0 0 12px rgba(107, 91, 255, 0.25);
 }
 
-/* Tooltip animation */
-.tooltip-anim {
-  animation: fadeIn 0.2s ease-out forwards;
+/* ── Compact speed bar ───────────────────────────────────────────────────── */
+.speed-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--space-2);
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius-md);
 }
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(5px); }
-  to { opacity: 1; transform: translateY(0); }
+
+.speed-playpause {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.07);
+  color: var(--text);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.18s, transform 0.14s;
+  flex-shrink: 0;
+}
+.speed-playpause.playing { background: rgba(107,91,255,0.25); border-color: rgba(107,91,255,0.5); }
+.speed-playpause:hover { background: rgba(107,91,255,0.4); transform: scale(1.1); }
+.speed-playpause:active { transform: scale(0.9); }
+
+.speed-presets {
+  display: flex;
+  gap: 3px;
+}
+.speed-preset {
+  padding: 4px 7px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  border-radius: 5px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, transform 0.12s;
+  white-space: nowrap;
+}
+.speed-preset:hover { background: rgba(255,255,255,0.1); color: var(--text); transform: translateY(-1px); }
+.speed-preset:active { transform: scale(0.93); }
+.speed-preset.active {
+  background: rgba(107,91,255,0.3);
+  border-color: rgba(107,91,255,0.6);
+  color: var(--primary-lt);
+  box-shadow: 0 0 8px rgba(107,91,255,0.3);
+}
+
+.speed-slider {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--primary);
+  height: 4px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+/* ── Planet labels ───────────────────────────────────────────────────────── */
+.planet-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 11px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9), 0 0 12px rgba(107,91,255,0.5);
+  pointer-events: none;
+  will-change: transform;
+  white-space: nowrap;
+  letter-spacing: 0.4px;
+  /* Hardware-accelerated — no layout thrash */
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Keyboard hint keys ──────────────────────────────────────────────────── */
+kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 3px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: rgba(255,255,255,0.55);
+}
+
+/* ── Tooltip animation ───────────────────────────────────────────────────── */
+.tooltip-anim {
+  animation: fadeInUp 0.18s ease-out forwards;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ── Planet zoom-in pulse (applied on double-click) ─────────────────────── */
+@keyframes zoomPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(107,91,255,0.5); }
+  70%  { box-shadow: 0 0 0 20px rgba(107,91,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(107,91,255,0); }
 }

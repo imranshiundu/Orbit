@@ -11,8 +11,149 @@ export class Animator {
     this.lastTime = performance.now();
     this.rafId = null;
 
-    // Track the last selected ID so we only re-focus when the selection actually changes
     this._lastSelectedId = undefined;
+
+    // Label cache: id → { el, lastX, lastY }
+    this._labelCache = new Map();
+    this._labelsContainer = null;
+
+    this._setupKeyboardNav();
+    this._setupDoubleClickFocus();
+    this._setupCustomEvents();
+  }
+
+  // ── Keyboard navigation ────────────────────────────────────────────────────
+  _setupKeyboardNav() {
+    window.addEventListener('keydown', (e) => {
+      // Don't trigger when typing in inputs
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      const key = e.key.toLowerCase();
+
+      if (key === 'h' || key === 'home') {
+        // Home — back to sun
+        this.store.dispatch({ type: 'SET_SELECTED', id: null });
+      }
+
+      if (key === 'r') {
+        // Reset camera to initial position
+        this._resetCamera();
+      }
+
+      if (key === 'f') {
+        // Focus the selected planet (re-trigger animation)
+        const { selectedId } = this.store.getState();
+        if (selectedId && selectedId !== 'new') {
+          this._lastSelectedId = null; // force re-trigger
+        }
+      }
+
+      if (key === '=' || key === '+') {
+        // Zoom in
+        this._zoom(-0.15);
+      }
+
+      if (key === '-' || key === '_') {
+        // Zoom out
+        this._zoom(0.15);
+      }
+
+      // Number keys 1-9 → focus nth planet
+      if (/^[1-9]$/.test(e.key)) {
+        const idx = parseInt(e.key) - 1;
+        const planets = this.store.getState().planets;
+        if (planets[idx]) {
+          this.store.dispatch({ type: 'SET_SELECTED', id: planets[idx].id });
+        }
+      }
+    });
+  }
+
+  _zoom(delta) {
+    if (!this.controls) return;
+    const dir = new THREE.Vector3();
+    dir.subVectors(this.camera.position, this.controls.target).normalize();
+    const dist = this.camera.position.distanceTo(this.controls.target);
+    const step = dist * delta;
+    this.camera.position.addScaledVector(dir, step);
+    this.controls.update();
+  }
+
+  _resetCamera() {
+    if (!this.controls) return;
+    const targetPos = new THREE.Vector3(0, 300, 600);
+    const targetLook = new THREE.Vector3(0, 0, 0);
+    this._animateCameraTo(targetPos, targetLook, 80);
+  }
+
+  _animateCameraTo(targetPos, targetLook, frames = 60) {
+    let f = 0;
+    const startPos = this.camera.position.clone();
+    const startTarget = this.controls.target.clone();
+    const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in-out
+
+    const animate = () => {
+      if (f >= frames) return;
+      f++;
+      const t = ease(f / frames);
+
+      this.camera.position.lerpVectors(startPos, targetPos, t);
+      this.controls.target.lerpVectors(startTarget, targetLook, t);
+      this.controls.update();
+      requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }
+
+  // ── Double-click to focus ──────────────────────────────────────────────────
+  _setupDoubleClickFocus() {
+    const canvas = this.renderer.domElement;
+    canvas.addEventListener('dblclick', (e) => {
+      const mouse = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, this.camera);
+
+      const meshes = [];
+      this.scene.traverse(child => {
+        if (child instanceof THREE.Mesh && child.userData?.id) meshes.push(child);
+      });
+
+      const hits = raycaster.intersectObjects(meshes);
+      if (hits.length > 0 && hits[0].object.userData.id) {
+        const id = hits[0].object.userData.id;
+        // Find if it's a planet id
+        const planetId = this.store.getState().planets.find(p => p.id === id)?.id;
+        if (planetId) {
+          this.store.dispatch({ type: 'SET_SELECTED', id: planetId });
+          this._zoomToPlanet(planetId);
+        }
+      }
+    });
+  }
+
+  // Zoom camera close to the planet with a smooth animation
+  _zoomToPlanet(planetId) {
+    const planet = this.solarSystem.planets.get(planetId);
+    if (!planet || !this.controls) return;
+
+    const pos = new THREE.Vector3();
+    planet.mesh.getWorldPosition(pos);
+
+    // Target position: pull back from planet based on its size
+    const radius = planet.mesh.geometry.parameters?.radius || 10;
+    const pullBack = Math.max(radius * 6, 40);
+    const offset = new THREE.Vector3(pullBack, pullBack * 0.4, pullBack);
+
+    const camTarget = pos.clone().add(offset);
+    this._animateCameraTo(camTarget, pos.clone(), 70);
+  }
+
+  // ── Custom events (from Sidebar reset button) ─────────────────────────────
+  _setupCustomEvents() {
+    window.addEventListener('orbit:reset-camera', () => this._resetCamera());
   }
 
   start() {
@@ -38,63 +179,50 @@ export class Animator {
     this.rafId = requestAnimationFrame(tick);
   }
 
-  /**
-   * When the selected planet CHANGES, smoothly animate the camera target toward it
-   * for ~1 second (60 frames). After that, the user has full control — we don't
-   * keep fighting them every frame.
-   */
   _handleSelectionChange(state) {
     const { selectedId } = state;
-
-    if (selectedId === this._lastSelectedId) return; // no change, nothing to do
+    if (selectedId === this._lastSelectedId) return;
     this._lastSelectedId = selectedId;
-
     if (!this.controls) return;
 
     if (selectedId && selectedId !== 'new') {
       const planet = this.solarSystem.planets.get(selectedId);
       if (!planet) return;
 
-      // Animate target toward the planet over ~60 frames
+      // One-shot 70-frame smooth camera target slide
       let frames = 0;
-      const maxFrames = 60;
-
+      const maxFrames = 70;
       const animate = () => {
         if (frames >= maxFrames) return;
         frames++;
-
         const pos = new THREE.Vector3();
         planet.mesh.getWorldPosition(pos);
-        this.controls.target.x += (pos.x - this.controls.target.x) * 0.1;
-        this.controls.target.y += (pos.y - this.controls.target.y) * 0.1;
-        this.controls.target.z += (pos.z - this.controls.target.z) * 0.1;
-
+        const t = 1 - Math.pow(0.88, frames); // ease-out
+        this.controls.target.lerp(pos, t * 0.12);
         requestAnimationFrame(animate);
       };
       requestAnimationFrame(animate);
     } else {
-      // Return to origin
       let frames = 0;
-      const maxFrames = 60;
+      const maxFrames = 70;
+      const origin = new THREE.Vector3(0, 0, 0);
       const animate = () => {
         if (frames >= maxFrames) return;
         frames++;
-        this.controls.target.x += (0 - this.controls.target.x) * 0.1;
-        this.controls.target.y += (0 - this.controls.target.y) * 0.1;
-        this.controls.target.z += (0 - this.controls.target.z) * 0.1;
+        this.controls.target.lerp(origin, 0.08);
         requestAnimationFrame(animate);
       };
       requestAnimationFrame(animate);
     }
   }
 
+  // ── Labels — fast path: skip DOM write if pixel position is unchanged ─────
   updateLabels() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('labels') !== 'true') return;
 
-    if (!this.labelsContainer) {
-      this.labelsContainer = document.getElementById('labels-container');
-      this.labelElements = new Map();
+    if (!this._labelsContainer) {
+      this._labelsContainer = document.getElementById('labels-container');
     }
 
     this.solarSystem.planets.forEach((planet, id) => {
@@ -102,26 +230,32 @@ export class Animator {
       planet.mesh.getWorldPosition(pos);
       pos.project(this.camera);
 
-      const x = (pos.x * .5 + .5) * window.innerWidth;
-      const y = (pos.y * -.5 + .5) * window.innerHeight;
-
-      if (!this.labelElements.has(id)) {
-        const el = document.createElement('div');
-        el.style.position = 'absolute';
-        el.style.color = 'white';
-        el.style.fontSize = '12px';
-        el.style.textShadow = '0 0 3px black';
-        el.textContent = planet.data.name;
-        this.labelsContainer.appendChild(el);
-        this.labelElements.set(id, el);
+      // Behind the camera — hide immediately
+      if (pos.z > 1) {
+        const cached = this._labelCache.get(id);
+        if (cached) cached.el.style.display = 'none';
+        return;
       }
 
-      const el = this.labelElements.get(id);
-      if (pos.z > 1) {
-        el.style.display = 'none';
-      } else {
-        el.style.display = 'block';
-        el.style.transform = `translate(${x}px, ${y - 20}px)`;
+      const x = Math.round((pos.x * 0.5 + 0.5) * window.innerWidth);
+      const y = Math.round((pos.y * -0.5 + 0.5) * window.innerHeight) - 20;
+
+      let cached = this._labelCache.get(id);
+      if (!cached) {
+        const el = document.createElement('div');
+        el.className = 'planet-label';
+        el.textContent = planet.data.name;
+        this._labelsContainer.appendChild(el);
+        cached = { el, lastX: null, lastY: null };
+        this._labelCache.set(id, cached);
+      }
+
+      // Only touch the DOM when position has moved more than 1px
+      if (cached.lastX !== x || cached.lastY !== y) {
+        cached.el.style.display = 'block';
+        cached.el.style.transform = `translate3d(${x}px,${y}px,0)`;
+        cached.lastX = x;
+        cached.lastY = y;
       }
     });
   }
