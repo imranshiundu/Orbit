@@ -139,5 +139,4 @@ export class Sidebar {
 
     this.speedControl.render();
   }
-  }
 }
