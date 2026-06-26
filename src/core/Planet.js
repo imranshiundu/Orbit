@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { scaleDistance, scaleSize } from '../utils/scaling.js';
 import { OrbitPath } from './OrbitPath.js';
+import { Moon } from './Moon.js';
+import { textureLoader } from './TextureLoader.js';
 
 export class Planet {
   constructor(data, scene) {
@@ -16,13 +18,8 @@ export class Planet {
 
     const geometry = new THREE.SphereGeometry(radius, 32, 32);
     const materialOptions = {};
-    
     if (data.texture) {
-      import('./TextureLoader.js').then(({ textureLoader }) => {
-        materialOptions.map = textureLoader.load(`/textures/${data.texture}`);
-        this.mesh.material = new THREE.MeshStandardMaterial(materialOptions);
-        this.mesh.material.needsUpdate = true;
-      });
+      materialOptions.map = textureLoader.load(`/textures/${data.texture}`);
     } else {
       materialOptions.color = data.color || 0xffffff;
     }
@@ -59,10 +56,8 @@ export class Planet {
 
     this.moons = [];
     if (data.moons && data.moons.length > 0) {
-      import('./Moon.js').then(({ Moon }) => {
-        data.moons.forEach(moonData => {
-          this.moons.push(new Moon(moonData, this.mesh));
-        });
+      data.moons.forEach(moonData => {
+        this.moons.push(new Moon(moonData, this.mesh));
       });
     }
   }

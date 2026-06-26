@@ -1,3 +1,5 @@
+import * as THREE from 'three';
+
 export class Animator {
   constructor(solarSystem, renderer, scene, camera, store, controls) {
     this.solarSystem = solarSystem;
@@ -42,7 +44,7 @@ export class Animator {
     if (selectedId && selectedId !== 'new') {
       const planet = this.solarSystem.planets.get(selectedId);
       if (planet) {
-        const pos = { x: 0, y: 0, z: 0 };
+        const pos = new THREE.Vector3();
         planet.mesh.getWorldPosition(pos);
         target.x += (pos.x - target.x) * 0.05;
         target.y += (pos.y - target.y) * 0.05;

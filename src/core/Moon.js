@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { scaleSize } from '../utils/scaling.js';
 import { OrbitPath } from './OrbitPath.js';
+import { textureLoader } from './TextureLoader.js';
 
 export class Moon {
   constructor(data, parentMesh) {
@@ -21,17 +22,14 @@ export class Moon {
     const geometry = new THREE.SphereGeometry(radius, 32, 32);
     const materialOptions = {};
     
-    if (data.texture) {
-      import('./TextureLoader.js').then(({ textureLoader }) => {
-        materialOptions.map = textureLoader.load(`/textures/${data.texture}`);
-        this.mesh.material = new THREE.MeshStandardMaterial(materialOptions);
-        this.mesh.material.needsUpdate = true;
-      });
-    } else {
+    if (!data.texture) {
       materialOptions.color = data.color || 0xffffff;
     }
     
     const material = new THREE.MeshStandardMaterial(materialOptions);
+    if (data.texture) {
+      material.map = textureLoader.load(`/textures/${data.texture}`);
+    }
     this.mesh = new THREE.Mesh(geometry, material);
     this.mesh.position.x = distance;
     this.mesh.userData = { id: data.id };

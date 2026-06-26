@@ -2,14 +2,24 @@ export class PlanetPanel {
   constructor(container, store) {
     this.container = container;
     this.store = store;
+    // Track dragging state to avoid re-rendering while sliders are in use
+    this._isDragging = false;
+    this._lastRenderedId = null;
   }
 
   render() {
     const state = this.store.getState();
     const selectedId = state.selectedId;
-    
+
     if (!selectedId) {
+      this._isDragging = false;
+      this._lastRenderedId = null;
       this.container.innerHTML = '';
+      return;
+    }
+
+    // If a slider is being dragged, only update value labels — never re-build HTML
+    if (this._isDragging && this._lastRenderedId === selectedId) {
       return;
     }
 
@@ -26,6 +36,8 @@ export class PlanetPanel {
       this.container.innerHTML = '';
       return;
     }
+
+    this._lastRenderedId = selectedId;
 
     this.container.innerHTML = `
       <div class="planet-panel glass-panel" style="padding: var(--space-4); color: var(--text); height: 100%; overflow-y: auto;">
@@ -89,22 +101,40 @@ export class PlanetPanel {
       </div>
     `;
 
-    // Real-time update labels
-    this.container.querySelector('#planet-size').addEventListener('input', (e) => {
-      this.container.querySelector('#planet-size-val').textContent = `${e.target.value} km`;
-    });
-    this.container.querySelector('#planet-speed').addEventListener('input', (e) => {
-      this.container.querySelector('#planet-speed-val').textContent = `${e.target.value} days`;
-    });
-    this.container.querySelector('#planet-distance').addEventListener('input', (e) => {
-      this.container.querySelector('#planet-distance-val').textContent = `${e.target.value} AU`;
+    // ── Slider drag tracking ──────────────────────────────────────────────────
+    // Mark dragging start/end so the store change listener skips re-renders
+    const sliders = ['planet-size', 'planet-speed', 'planet-distance'];
+    sliders.forEach(id => {
+      const el = this.container.querySelector(`#${id}`);
+      if (!el) return;
+
+      el.addEventListener('mousedown', () => { this._isDragging = true; });
+      el.addEventListener('touchstart', () => { this._isDragging = true; }, { passive: true });
+
+      el.addEventListener('mouseup', () => { this._isDragging = false; });
+      el.addEventListener('touchend', () => { this._isDragging = false; });
+
+      // Keep in-panel label in sync while dragging
+      el.addEventListener('input', (e) => {
+        const unit = id === 'planet-size' ? 'km' : id === 'planet-speed' ? 'days' : 'AU';
+        const valEl = this.container.querySelector(`#${id}-val`);
+        if (valEl) valEl.textContent = `${e.target.value} ${unit}`;
+      });
     });
 
+    // Also stop dragging if mouse leaves the window mid-drag
+    const stopDragging = () => { this._isDragging = false; };
+    window.addEventListener('mouseup', stopDragging, { once: true });
+
+    // ── Close ─────────────────────────────────────────────────────────────────
     this.container.querySelector('#close-panel-btn').addEventListener('click', () => {
+      this._isDragging = false;
       this.store.dispatch({ type: 'SET_SELECTED', id: null });
     });
 
+    // ── Save ──────────────────────────────────────────────────────────────────
     this.container.querySelector('#save-planet-btn').addEventListener('click', () => {
+      // Read values directly from DOM at click time — never trust stale planet data
       const data = {
         name: this.container.querySelector('#planet-name').value,
         diameterKm: parseFloat(this.container.querySelector('#planet-size').value),
@@ -115,13 +145,18 @@ export class PlanetPanel {
 
       if (isNew) {
         data.id = 'planet_' + Date.now();
+        data.moons = [];
         this.store.dispatch({ type: 'ADD_PLANET', payload: data });
         this.store.dispatch({ type: 'SET_SELECTED', id: null });
       } else {
+        // Preserve existing moons when saving other properties
+        const currentPlanet = this.store.getState().planets.find(p => p.id === selectedId);
+        if (currentPlanet) data.moons = currentPlanet.moons || [];
         this.store.dispatch({ type: 'UPDATE_PLANET', id: selectedId, payload: data });
       }
     });
 
+    // ── Delete planet ─────────────────────────────────────────────────────────
     const deleteBtn = this.container.querySelector('#delete-planet-btn');
     if (deleteBtn) {
       deleteBtn.addEventListener('click', () => {
@@ -131,37 +166,32 @@ export class PlanetPanel {
       });
     }
 
+    // ── Add moon ──────────────────────────────────────────────────────────────
     const addMoonBtn = this.container.querySelector('#add-moon-btn');
     if (addMoonBtn) {
       addMoonBtn.addEventListener('click', () => {
-        const moons = planet.moons ? [...planet.moons] : [];
+        const currentPlanet = this.store.getState().planets.find(p => p.id === selectedId);
+        const moons = currentPlanet?.moons ? [...currentPlanet.moons] : [];
         moons.push({
           id: 'moon_' + Date.now(),
           name: 'Moon ' + (moons.length + 1),
           diameterKm: Math.floor(Math.random() * 3000 + 1000),
           distancePlanetKm: Math.floor(Math.random() * 200000 + 100000),
           orbitalPeriodDays: Math.random() * 30 + 10,
-          color: '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')
+          color: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'),
         });
-        
-        this.store.dispatch({
-          type: 'UPDATE_PLANET',
-          id: selectedId,
-          payload: { moons }
-        });
+        this.store.dispatch({ type: 'UPDATE_PLANET', id: selectedId, payload: { moons } });
       });
     }
 
+    // ── Delete moon ───────────────────────────────────────────────────────────
     this.container.querySelectorAll('.delete-moon-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const index = parseInt(e.target.dataset.index);
-        const moons = [...planet.moons];
+        const currentPlanet = this.store.getState().planets.find(p => p.id === selectedId);
+        const moons = [...(currentPlanet?.moons || [])];
         moons.splice(index, 1);
-        this.store.dispatch({
-          type: 'UPDATE_PLANET',
-          id: selectedId,
-          payload: { moons }
-        });
+        this.store.dispatch({ type: 'UPDATE_PLANET', id: selectedId, payload: { moons } });
       });
     });
   }

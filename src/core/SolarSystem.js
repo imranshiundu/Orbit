@@ -56,18 +56,22 @@ export class SolarSystem {
     this.scene.add(this.asteroids);
   }
 
-  addPlanet(planetData) {
+  addPlanet(planetData, pivotRotationY = 0) {
     if (this.planets.has(planetData.id)) return;
     const planet = new Planet(planetData, this.scene);
+    planet.pivot.rotation.y = pivotRotationY;
     this.planets.set(planetData.id, planet);
   }
 
   removePlanet(id) {
     const planet = this.planets.get(id);
     if (planet) {
+      const savedRotation = planet.pivot.rotation.y;
       planet.destroy();
       this.planets.delete(id);
+      return savedRotation;
     }
+    return 0;
   }
 
   update(deltaTime) {

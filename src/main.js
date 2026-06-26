@@ -52,10 +52,10 @@ store.on('change', () => {
 store.on('ADD_PLANET', (action) => solarSystem.addPlanet(action.payload));
 store.on('DELETE_PLANET', (action) => solarSystem.removePlanet(action.id));
 store.on('UPDATE_PLANET', (action) => {
-  solarSystem.removePlanet(action.id);
+  const savedRotation = solarSystem.removePlanet(action.id);
   const state = store.getState();
   const planetData = state.planets.find(p => p.id === action.id);
-  solarSystem.addPlanet(planetData);
+  if (planetData) solarSystem.addPlanet(planetData, savedRotation);
 });
 
 animator.start();
